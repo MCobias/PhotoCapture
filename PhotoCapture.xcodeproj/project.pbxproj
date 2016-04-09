@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		F00011A61CB9657400E22140 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F00011A51CB9657400E22140 /* main.cpp */; };
+		F00011B51CB9660D00E22140 /* capturecamera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F00011AE1CB9660D00E22140 /* capturecamera.cpp */; };
+		F00011B91CB97B4300E22140 /* GPhoto2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F00011B81CB97B4300E22140 /* GPhoto2.framework */; };
+		F00011BD1CB9B05E00E22140 /* QtGui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F00011BC1CB9B05E00E22140 /* QtGui.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +28,10 @@
 /* Begin PBXFileReference section */
 		F00011A21CB9657400E22140 /* PhotoCapture */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PhotoCapture; sourceTree = BUILT_PRODUCTS_DIR; };
 		F00011A51CB9657400E22140 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		F00011AE1CB9660D00E22140 /* capturecamera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = capturecamera.cpp; sourceTree = "<group>"; };
+		F00011AF1CB9660D00E22140 /* capturecamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = capturecamera.h; sourceTree = "<group>"; };
+		F00011B81CB97B4300E22140 /* GPhoto2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GPhoto2.framework; path = ../../../../../Library/Frameworks/GPhoto2.framework; sourceTree = "<group>"; };
+		F00011BC1CB9B05E00E22140 /* QtGui.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtGui.framework; path = ../../../../../Library/Frameworks/QtGui.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +39,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F00011BD1CB9B05E00E22140 /* QtGui.framework in Frameworks */,
+				F00011B91CB97B4300E22140 /* GPhoto2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +50,8 @@
 		F00011991CB9657400E22140 = {
 			isa = PBXGroup;
 			children = (
+				F00011BC1CB9B05E00E22140 /* QtGui.framework */,
+				F00011B81CB97B4300E22140 /* GPhoto2.framework */,
 				F00011A41CB9657400E22140 /* PhotoCapture */,
 				F00011A31CB9657400E22140 /* Products */,
 			);
@@ -57,6 +68,8 @@
 		F00011A41CB9657400E22140 /* PhotoCapture */ = {
 			isa = PBXGroup;
 			children = (
+				F00011AE1CB9660D00E22140 /* capturecamera.cpp */,
+				F00011AF1CB9660D00E22140 /* capturecamera.h */,
 				F00011A51CB9657400E22140 /* main.cpp */,
 			);
 			path = PhotoCapture;
@@ -119,6 +132,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F00011A61CB9657400E22140 /* main.cpp in Sources */,
+				F00011B51CB9660D00E22140 /* capturecamera.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +223,31 @@
 		F00011AA1CB9657400E22140 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				HEADER_SEARCH_PATHS = /usr/local/include/;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
+				OTHER_LDFLAGS = (
+					"-lopencv_calib3d",
+					"-lopencv_core",
+					"-lopencv_features2d",
+					"-lopencv_flann",
+					"-lopencv_highgui",
+					"-lopencv_imgcodecs",
+					"-lopencv_imgproc",
+					"-lopencv_ml",
+					"-lopencv_objdetect",
+					"-lopencv_photo",
+					"-lopencv_shape",
+					"-lopencv_stitching",
+					"-lopencv_superres",
+					"-lopencv_video",
+					"-lopencv_videoio",
+					"-lopencv_videostab",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -216,6 +255,31 @@
 		F00011AB1CB9657400E22140 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				HEADER_SEARCH_PATHS = /usr/local/include/;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
+				OTHER_LDFLAGS = (
+					"-lopencv_calib3d",
+					"-lopencv_core",
+					"-lopencv_features2d",
+					"-lopencv_flann",
+					"-lopencv_highgui",
+					"-lopencv_imgcodecs",
+					"-lopencv_imgproc",
+					"-lopencv_ml",
+					"-lopencv_objdetect",
+					"-lopencv_photo",
+					"-lopencv_shape",
+					"-lopencv_stitching",
+					"-lopencv_superres",
+					"-lopencv_video",
+					"-lopencv_videoio",
+					"-lopencv_videostab",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -239,6 +303,7 @@
 				F00011AB1CB9657400E22140 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

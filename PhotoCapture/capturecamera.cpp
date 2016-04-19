@@ -6,26 +6,255 @@
 //  Copyright © 2016 Marcelo Cobias. All rights reserved.
 //
 
-#include "capturecamera.h"
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <cstring>
-
+#include "capturecamera.h"
 
 using namespace std;
 using namespace cv;
+
+
+static int _lookup_widget(CameraWidget*widget, const char *key, CameraWidget **child)
+{
+    int ret;
+    ret = gp_widget_get_child_by_name (widget, key, child);
+    if (ret < GP_OK)
+        ret = gp_widget_get_child_by_label (widget, key, child);
+    return ret;
+    
+}
+
+void CAPTURECAMERA::setConfigureCameraFlashMode(void *ref)
+{
+    int retval;
+    char			*mval;
+    //int choices;
+    printf("Get root configm flash mode .\n");
+    CameraWidget *rootconfig;
+    CameraWidgetType	type;
+    CameraWidget *actualrootconfig;
+    CameraWidget *child;
+    
+    retval = gp_camera_get_config(cameranow, &rootconfig, context);
+    actualrootconfig = rootconfig;
+    
+    retval = gp_widget_get_child_by_name(rootconfig, "main", &child);
+    
+    rootconfig = child;
+    retval = gp_widget_get_child_by_name(rootconfig, "capturesettings", &child);
+    
+    rootconfig = child;
+    retval = gp_widget_get_child_by_name(rootconfig, "flashmode", &child);
+    
+    int value = 1;
+    CameraWidget *capture = child;
+    const char *widgetinfo;
+    
+    gp_widget_get_name(capture, &widgetinfo);
+    gp_widget_set_value(capture, &value);
+    
+    const char *widgetlabel;
+    gp_widget_get_label(capture, &widgetlabel);
+    
+    int widgetid;
+    gp_widget_get_id(capture, &widgetid);
+    
+    CameraWidgetType widgettype;
+    gp_widget_get_type(capture, &widgettype);
+    gp_widget_get_type(capture, &type);
+    
+    //choices = gp_widget_count_choices (capture);
+    //value = gp_widget_get_value (capture, &mval);
+    value = gp_widget_get_choice (capture, 2, (const char**)&mval);
+    value = gp_widget_set_value (child, mval);
+    
+    retval = gp_camera_set_config(cameranow, actualrootconfig, context);
+    printf("Sucess: %d\n", retval);
+    
+    if (retval < 0)
+    {
+        closeCamera();
+        openCamera(this);
+    }
+    
+    gp_widget_free(actualrootconfig);
+}
+
+
+void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
+{
+    int retval, value;
+    //int choices;
+    float			rval, min, max;
+    printf("Get root config Zoom.\n");
+    CameraWidget *rootconfig;
+    CameraWidgetType	type;
+    CameraWidget *actualrootconfig;
+    CameraWidget *child;
+    
+    retval = gp_camera_get_config(cameranow, &rootconfig, context);
+    actualrootconfig = rootconfig;
+    
+    retval = gp_widget_get_child_by_name(rootconfig, "main", &child);
+    
+    rootconfig = child;
+    retval = gp_widget_get_child_by_name(rootconfig, "capturesettings", &child);
+
+    rootconfig = child;
+    retval = gp_widget_get_child_by_name(rootconfig, "zoom", &child);
+    
+    CameraWidget *capture = child;
+    const char *widgetinfo;
+    
+    gp_widget_get_name(capture, &widgetinfo);
+    gp_widget_set_value(capture, &value);
+    
+    const char *widgetlabel;
+    gp_widget_get_label(capture, &widgetlabel);
+    
+    int widgetid;
+    gp_widget_get_id(capture, &widgetid);
+    
+    CameraWidgetType widgettype;
+    gp_widget_get_type(capture, &widgettype);
+    gp_widget_get_type(capture, &type);
+    
+    
+    //choices = gp_widget_count_choices (capture);
+    value = gp_widget_get_value (capture, &rval);
+    value = gp_widget_get_range(capture, &min, &max, &rval);
+
+    rval = (float) x;
+    value = gp_widget_set_value(child, &rval);
+    
+    retval = gp_camera_set_config(cameranow, actualrootconfig, context);
+    printf("Sucess: %d\n", retval);
+    
+    if (retval < 0)
+    {
+        closeCamera();
+        openCamera(this);
+    }
+    
+    gp_widget_free(actualrootconfig);
+}
+
+void CAPTURECAMERA::setConfigureCameraImageSize(void *ref)
+{
+    int retval;
+    char			*mval;
+    //int choices;
+    printf("Get root config Image Size.\n");
+    CameraWidget *rootconfig;
+    CameraWidgetType	type;
+    CameraWidget *actualrootconfig;
+    CameraWidget *child;
+    
+    retval = gp_camera_get_config(cameranow, &rootconfig, context);
+    actualrootconfig = rootconfig;
+    
+    retval = gp_widget_get_child_by_name(rootconfig, "main", &child);
+    
+    rootconfig = child;
+    retval = gp_widget_get_child_by_name(rootconfig, "imgsettings", &child);
+    
+    rootconfig = child;
+    retval = gp_widget_get_child_by_name(rootconfig, "imagesize", &child);
+    
+    int value = 1;
+    CameraWidget *capture = child;
+    const char *widgetinfo;
+    
+    gp_widget_get_name(capture, &widgetinfo);
+    gp_widget_set_value(capture, &value);
+    
+    const char *widgetlabel;
+    gp_widget_get_label(capture, &widgetlabel);
+    
+    int widgetid;
+    gp_widget_get_id(capture, &widgetid);
+    
+    CameraWidgetType widgettype;
+    gp_widget_get_type(capture, &widgettype);
+    gp_widget_get_type(capture, &type);
+    
+    //choices = gp_widget_count_choices (capture);
+    //value = gp_widget_get_value (capture, &mval);
+    value = gp_widget_get_choice (capture, 3, (const char**)&mval);
+    value = gp_widget_set_value (child, mval);
+    
+    retval = gp_camera_set_config(cameranow, actualrootconfig, context);
+    printf("Sucess: %d\n", retval);
+    
+    if (retval < 0)
+    {
+        closeCamera();
+        openCamera(this);
+    }
+    
+    gp_widget_free(actualrootconfig);
+}
+
+void CAPTURECAMERA::canon_enable_capture(Camera *camera, GPContext *context, CameraWidget *config)
+{
+    int onoff = 1;
+    CameraWidgetType type;
+    CameraWidget *child;
+    int ret;
+    
+    ret = _lookup_widget (config, "capture", &child);
+    if (ret < GP_OK)
+    {
+        //fprintf (stderr, "lookup widget failed: %d\n", ret);
+        goto out;
+    }
+    
+    ret = gp_widget_get_type (child, &type);
+    if (ret < GP_OK)
+    {
+        //fprintf (stderr, "widget get type failed: %d\n", ret);
+        goto out;
+    }
+    switch (type)
+    {
+        case GP_WIDGET_TOGGLE:
+            break;
+        default:
+            fprintf (stderr, "widget has bad type %d\n", type);
+            ret = GP_ERROR_BAD_PARAMETERS;
+            goto out;
+    }
+    ret = gp_widget_set_value (child, &onoff);
+    if (ret < GP_OK)
+    {
+        //fprintf (stderr, "toggling Canon capture to %d failed with %d\n", onoff, ret);
+        goto out;
+    }
+    ret = gp_camera_set_config (camera, config, context);
+    if (ret < GP_OK)
+    {
+        //fprintf (stderr, "camera_set_config failed: %d\n", ret);
+        return;
+    }
+    
+out:
+    child=NULL;
+    return;
+}
 
 
 bool CAPTURECAMERA::openCamera(void *ref)
 {
     gp_camera_new (&cameranow);
     context = gp_context_new();
-  
     gp_context_set_error_func(context,  CAPTURECAMERA::cp_error_func, this);
     gp_context_set_message_func(context, CAPTURECAMERA::cp_message_func, this);
 
     int ret = gp_camera_init (cameranow, context);
-
+    canon_enable_capture(cameranow, context, NULL);
+    
     if (ret < GP_OK)
     {
         return false;
@@ -53,11 +282,10 @@ bool CAPTURECAMERA::closeCamera()
 
 void CAPTURECAMERA::processFrame(Mat &currentFrame)
 {
-    //Mat imgbuf;
-    //vector<char> vec;
+    Mat imgbuf;
     CameraFile *cf;
     gp_file_new(&cf);
-
+    
     gp_camera_capture_preview (cameranow, cf, context);
 
     unsigned long datasize = 0;
@@ -68,16 +296,8 @@ void CAPTURECAMERA::processFrame(Mat &currentFrame)
     if (datasize == 0 )
         return;
 
-    /*const char* end = data + strlen( data );
-    vec.insert( vec.end(), data, end );
-    
-    imgbuf = Mat(vec);
-    currentFrame = imdecode(imgbuf, CV_LOAD_IMAGE_COLOR);*/
-    
-    QPixmap pm;
-    pm.loadFromData( (uchar*) data,  (uint) datasize);
-    QImage im = pm.toImage();
-    currentFrame = qimage2cvMat(im);
+    imgbuf = Mat(240, 320, CV_8U,(char*)data);
+    currentFrame = imdecode(imgbuf, CV_LOAD_IMAGE_COLOR);
     Image = currentFrame;
     
     gp_file_free(cf);
@@ -85,10 +305,10 @@ void CAPTURECAMERA::processFrame(Mat &currentFrame)
 
 bool CAPTURECAMERA::capturePhoto(Mat &frame, int waittime)
 {
-    //Mat imgbuf;
-    //vector<char> vec;
+    Mat imgbuf;
     CameraFile *cf;
     CameraFilePath camera_file_path;
+    
     int ret = gp_camera_capture(cameranow, GP_CAPTURE_IMAGE, &camera_file_path, context);
     if (ret < GP_OK)
         return false;
@@ -101,18 +321,10 @@ bool CAPTURECAMERA::capturePhoto(Mat &frame, int waittime)
 
     gp_file_get_data_and_size(cf, &data, &datasize);
 
-    /*const char* end = data + strlen( data );
-    vec.insert( vec.end(), data, end );
-    
-    imgbuf = Mat(vec);
-    frame = imdecode(imgbuf, CV_LOAD_IMAGE_COLOR);*/
-    
-    QPixmap pm;
-    pm.loadFromData( (uchar*) data,  (uint) datasize);
-    QImage im = pm.toImage();
-    frame = qimage2cvMat(im);
+    imgbuf = Mat(480, 640, CV_8U,(char*)data);
+    frame = imdecode(imgbuf, CV_LOAD_IMAGE_COLOR);
     Image = frame;
-
+    
     gp_camera_file_delete(cameranow, camera_file_path.folder, camera_file_path.name, context);
     gp_file_free(cf);
 
@@ -167,36 +379,4 @@ void CAPTURECAMERA::cp_message_func(GPContext *context, const char *text, void *
 {
     fprintf(stdout, "*** Camera message ***\n");
     fprintf(stdout, text, "%s\n");
-}
-
-void CAPTURECAMERA::setConfigureCamera(int value, char* param)
-{
-    int val;
-    CameraWidget *parent, *child;
-    gp_camera_get_config(cameranow, &parent, context);
-    gp_widget_get_child_by_name(parent, param, &child);
-    gp_widget_get_value (child, &val);
-    printf("Parametre value: ");
-    printf("%d\n", val);
-    printf("New value\n");
-    val = value;
-    printf("%d\n", value);
-    printf("%d\n", gp_widget_set_value(child, &val));
-    int vret = gp_camera_set_config(cameranow, parent, context);
-    
-    if (vret < 0)
-    {
-        closeCamera();
-        openCamera(this);
-    }
-    gp_widget_free (parent);
-}
-
-Mat CAPTURECAMERA::qimage2cvMat(QImage &im)
-{
-    cv::Mat mat = cv::Mat(im.height(), im.width(), CV_8UC4, (uchar*)im.bits(), im.bytesPerLine());
-    cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
-    int from_to[] = { 0,0,  1,1,  2,2 };
-    cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
-    return mat2;
 }

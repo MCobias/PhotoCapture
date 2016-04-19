@@ -6,48 +6,85 @@
 //  Copyright © 2016 Marcelo Cobias. All rights reserved.
 //
 
-
 #include <sys/stat.h>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include "capturecamera.h"
+
 
 void killCamera();
 bool isDirExist(string path);
 bool makePath(string path);
-void printImage(Mat Image, string nameWindow, int TamW, int TamH, int PosX, int PosY);
+void captureCamera();
+Mat drawLines(Mat image);
+void printImage(Mat Image, string nameWindow, int PosX, int PosY);
 
 int main(int argc, char *argv[])
 {
-    string name;
+    int i = 0, count = 1;
     CAPTURECAMERA cam;
+    string name, year, sex;
     Mat imageCapture;
     
-    cout << "Person name capture: ";
+    cout << "Name Image: ";
     cin >> name;
     
-    if(cam.openCamera(&cam))
-    {
-        cam.setConfigureCamera(1, (char*) "flasmode");
-        cam.setConfigureCamera(1, (char*) "resolution");
+    cout << "Age: ";
+    cin >> year;
+    
+    cout << "Sex: ";
+    cin >> sex;
+
+    
+    killCamera();
+    
         
-        while(waitKey(33) != 13)
+    if(isDirExist("/Users/mcobias/Desktop/DataSet/"))
+    {
+        if(cam.openCamera(&cam))
         {
-            cam.processFrame(imageCapture);
-            printImage(cam.getCurrentImage(), "Camera Preview - Take a photo press ENTER", 200, 200, 100, 100);
-            cam.removeImage();
-        }
-        cam.capturePhoto(imageCapture, 2000);
-        if(cam.isCaptured())
-        {
-            if(isDirExist("/Users/mcobias/Desktop/DataSet/"))
+            while(waitKey(33) != 27)
             {
-                imwrite("/Users/mcobias/Desktop/DataSet/ImageDataSet_" + name, cam.getCurrentImage());
-                printImage(cam.getCurrentImage(), "Image captured camera....", 620, 480, 300, 100);
+                cam.processFrame(imageCapture);
+                transpose(imageCapture, imageCapture);
+                flip(imageCapture, imageCapture, 0);
+                resize(imageCapture, imageCapture, Size(480,640));
+                drawLines(imageCapture);
+                printImage(imageCapture, "Press ESC exit or P take a photo", 100, 100);
+                cam.removeImage();
+                if(i > 4 ){ i = 0;}
+                
+                int c = cvWaitKey(15);
+                
+                if(c == 'p')
+                {
+                    c = 0;
+                    count ++;
+                    cam.setConfigureCameraImageSize(&cam);
+                    cam.setConfigureCameraFlashMode(&cam);
+                    cam.capturePhoto(imageCapture, 1000);
+                    transpose(imageCapture, imageCapture);
+                    flip(imageCapture, imageCapture, 0);
+                    imwrite("/Users/mcobias/Desktop/DataSet/ImageDataSet_" + name + "_" + year + "_" + sex + "_" + to_string(count) + ".jpg", imageCapture);
+                    printImage(imageCapture, "Captured", 600, 100);
+                }
+                else if( c == '=' && i < 12)
+                {
+                    i++;
+                    cam.setConfigureCameraZoom(&cam, i);
+                }
+                else if(c == '-' && i > 0)
+                {
+                    i--;
+                    cam.setConfigureCameraZoom(&cam, i);
+                }
+                if(c == 27)
+                    break;
+                
             }
-        }
-        else
-        {
-            cout << "Photo not captured, try again!";
         }
     }
     
@@ -56,16 +93,15 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void printImage(Mat Image, string nameWindow, int TamW, int TamH, int PosX, int PosY)
-{
-    resize(Image, Image, Size(), TamW, TamH);
-    imshow(nameWindow, Image);
-    moveWindow(nameWindow, PosX, PosY);
-}
-
 void killCamera()
 {
     system("killall PTPCamera");
+}
+
+void printImage(Mat Image, string nameWindow, int PosX, int PosY)
+{
+    imshow(nameWindow, Image);
+    moveWindow(nameWindow, PosX, PosY);
 }
 
 bool isDirExist(string path)
@@ -106,4 +142,32 @@ bool makePath(string path)
         default:
             return false;
     }
+}
+
+Mat drawLines(Mat image)
+{
+    int midX = image.cols/2;
+    int eyeR = midX - (image.cols * 0.125);
+    int eyeL = midX + (image.cols * 0.125); //distância com +- 60 pixeis para resoluções 640x480
+    int eyeHeigh = image.rows*0.334375; //Distância de 260 pixeis para imagens 640x480
+    
+        //image = imread("teste.ppm");
+        LineIterator it(image, Point(midX, 0), Point(midX, image.rows), 8);
+        // get a line iterator
+        for (int i = 0; i < it.count; i++, it++)
+            if (i % 5 != 0) {
+                (*it)[2] = 255;
+            }         // every 5'th pixel gets dropped, blue stipple line
+        
+        LineIterator it2(image, Point(0, eyeHeigh), Point(image.cols, eyeHeigh), 8);
+        
+        for (int i = 0; i < it2.count; i++, it2++)
+            if (i % 5 != 0) {
+                (*it2)[2] = 255;
+            }
+        
+        line(image, Point(eyeR + 4, eyeHeigh), Point(eyeR - 4, eyeHeigh), Scalar(0, 255, 255), 3, 8);
+        line(image, Point(eyeL + 4, eyeHeigh), Point(eyeL - 4, eyeHeigh), Scalar(0, 255, 255), 3, 8);
+    
+    return image;
 }

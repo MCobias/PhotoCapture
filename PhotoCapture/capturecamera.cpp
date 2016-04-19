@@ -6,14 +6,7 @@
 //  Copyright © 2016 Marcelo Cobias. All rights reserved.
 //
 
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <cstring>
 #include "capturecamera.h"
-
-using namespace std;
-using namespace cv;
 
 
 static int _lookup_widget(CameraWidget*widget, const char *key, CameraWidget **child)
@@ -28,12 +21,11 @@ static int _lookup_widget(CameraWidget*widget, const char *key, CameraWidget **c
 
 void CAPTURECAMERA::setConfigureCameraFlashMode(void *ref)
 {
-    int retval;
-    char			*mval;
+    int retval, value;
+    char *val;
     //int choices;
-    printf("Get root configm flash mode .\n");
+    printf("Get root config flash mode .\n");
     CameraWidget *rootconfig;
-    CameraWidgetType	type;
     CameraWidget *actualrootconfig;
     CameraWidget *child;
     
@@ -48,27 +40,12 @@ void CAPTURECAMERA::setConfigureCameraFlashMode(void *ref)
     rootconfig = child;
     retval = gp_widget_get_child_by_name(rootconfig, "flashmode", &child);
     
-    int value = 1;
     CameraWidget *capture = child;
-    const char *widgetinfo;
-    
-    gp_widget_get_name(capture, &widgetinfo);
-    gp_widget_set_value(capture, &value);
-    
-    const char *widgetlabel;
-    gp_widget_get_label(capture, &widgetlabel);
-    
-    int widgetid;
-    gp_widget_get_id(capture, &widgetid);
-    
-    CameraWidgetType widgettype;
-    gp_widget_get_type(capture, &widgettype);
-    gp_widget_get_type(capture, &type);
     
     //choices = gp_widget_count_choices (capture);
     //value = gp_widget_get_value (capture, &mval);
-    value = gp_widget_get_choice (capture, 2, (const char**)&mval);
-    value = gp_widget_set_value (child, mval);
+    value = gp_widget_get_choice (capture, 2, (const char**)&val);
+    value = gp_widget_set_value (child, val);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
     printf("Sucess: %d\n", retval);
@@ -87,10 +64,9 @@ void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
 {
     int retval, value;
     //int choices;
-    float			rval, min, max;
-    printf("Get root config Zoom.\n");
+    float val, min, max;
+    printf("Get root config zoom.\n");
     CameraWidget *rootconfig;
-    CameraWidgetType	type;
     CameraWidget *actualrootconfig;
     CameraWidget *child;
     
@@ -106,28 +82,13 @@ void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
     retval = gp_widget_get_child_by_name(rootconfig, "zoom", &child);
     
     CameraWidget *capture = child;
-    const char *widgetinfo;
     
-    gp_widget_get_name(capture, &widgetinfo);
-    gp_widget_set_value(capture, &value);
-    
-    const char *widgetlabel;
-    gp_widget_get_label(capture, &widgetlabel);
-    
-    int widgetid;
-    gp_widget_get_id(capture, &widgetid);
-    
-    CameraWidgetType widgettype;
-    gp_widget_get_type(capture, &widgettype);
-    gp_widget_get_type(capture, &type);
-    
-    
-    //choices = gp_widget_count_choices (capture);
-    value = gp_widget_get_value (capture, &rval);
-    value = gp_widget_get_range(capture, &min, &max, &rval);
+    //choices = gp_widget_count_choices(capture);
+    value = gp_widget_get_value (capture, &val);
+    value = gp_widget_get_range(capture, &min, &max, &val);
 
-    rval = (float) x;
-    value = gp_widget_set_value(child, &rval);
+    val = (float) x;
+    value = gp_widget_set_value(child, &val);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
     printf("Sucess: %d\n", retval);
@@ -143,12 +104,11 @@ void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
 
 void CAPTURECAMERA::setConfigureCameraImageSize(void *ref)
 {
-    int retval;
-    char			*mval;
+    int retval, value;
+    char *val;
     //int choices;
     printf("Get root config Image Size.\n");
     CameraWidget *rootconfig;
-    CameraWidgetType	type;
     CameraWidget *actualrootconfig;
     CameraWidget *child;
     
@@ -163,27 +123,12 @@ void CAPTURECAMERA::setConfigureCameraImageSize(void *ref)
     rootconfig = child;
     retval = gp_widget_get_child_by_name(rootconfig, "imagesize", &child);
     
-    int value = 1;
     CameraWidget *capture = child;
-    const char *widgetinfo;
-    
-    gp_widget_get_name(capture, &widgetinfo);
-    gp_widget_set_value(capture, &value);
-    
-    const char *widgetlabel;
-    gp_widget_get_label(capture, &widgetlabel);
-    
-    int widgetid;
-    gp_widget_get_id(capture, &widgetid);
-    
-    CameraWidgetType widgettype;
-    gp_widget_get_type(capture, &widgettype);
-    gp_widget_get_type(capture, &type);
     
     //choices = gp_widget_count_choices (capture);
     //value = gp_widget_get_value (capture, &mval);
-    value = gp_widget_get_choice (capture, 3, (const char**)&mval);
-    value = gp_widget_set_value (child, mval);
+    value = gp_widget_get_choice (capture, 3, (const char**)&val);
+    value = gp_widget_set_value (child, val);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
     printf("Sucess: %d\n", retval);
@@ -249,8 +194,8 @@ bool CAPTURECAMERA::openCamera(void *ref)
 {
     gp_camera_new (&cameranow);
     context = gp_context_new();
-    gp_context_set_error_func(context,  CAPTURECAMERA::cp_error_func, this);
-    gp_context_set_message_func(context, CAPTURECAMERA::cp_message_func, this);
+    gp_context_set_error_func(context,  CAPTURECAMERA::error_func, this);
+    gp_context_set_message_func(context, CAPTURECAMERA::message_func, this);
 
     int ret = gp_camera_init (cameranow, context);
     canon_enable_capture(cameranow, context, NULL);
@@ -280,7 +225,7 @@ bool CAPTURECAMERA::closeCamera()
     return true;
 }
 
-void CAPTURECAMERA::processFrame(Mat &currentFrame)
+void CAPTURECAMERA::capturePreview(Mat &frame)
 {
     Mat imgbuf;
     CameraFile *cf;
@@ -297,8 +242,7 @@ void CAPTURECAMERA::processFrame(Mat &currentFrame)
         return;
 
     imgbuf = Mat(240, 320, CV_8U,(char*)data);
-    currentFrame = imdecode(imgbuf, CV_LOAD_IMAGE_COLOR);
-    Image = currentFrame;
+    frame = imdecode(imgbuf, CV_LOAD_IMAGE_COLOR);
     
     gp_file_free(cf);
 }
@@ -323,24 +267,24 @@ bool CAPTURECAMERA::capturePhoto(Mat &frame, int waittime)
 
     imgbuf = Mat(480, 640, CV_8U,(char*)data);
     frame = imdecode(imgbuf, CV_LOAD_IMAGE_COLOR);
-    Image = frame;
     
     gp_camera_file_delete(cameranow, camera_file_path.folder, camera_file_path.name, context);
     gp_file_free(cf);
 
-    frame.copyTo(Image);
+    frame.copyTo(frame);
     
     CameraEventType type;
     void *datavoid;
     while(1)
     {
         gp_camera_wait_for_event(cameranow, waittime, &type, &datavoid, context);
-        if(type == GP_EVENT_TIMEOUT) {
+        if(type == GP_EVENT_TIMEOUT)
+        {
             break;
         }
         else if (type == GP_EVENT_CAPTURE_COMPLETE)
         {
-            printf("Capture completea\n");
+            printf("Capture complete...\n");
             waittime = 100;
         }
         else if (type != GP_EVENT_UNKNOWN)
@@ -352,30 +296,13 @@ bool CAPTURECAMERA::capturePhoto(Mat &frame, int waittime)
     return true;
 }
 
-bool CAPTURECAMERA::isCaptured()
-{
-    if (Image.empty() == true)
-        return false;
-    return true;
-}
-
-void CAPTURECAMERA::removeImage()
-{
-    this->Image.release();
-}
-
-Mat CAPTURECAMERA::getCurrentImage()
-{
-    return this->Image;
-}
-
-void CAPTURECAMERA::cp_error_func(GPContext *context, const char *text, void *data)
+void CAPTURECAMERA::error_func(GPContext *context, const char *text, void *data)
 {
     fprintf(stderr, "*** Camera error ***\n");
     fprintf(stderr, text, "%s\n");
 }
 
-void CAPTURECAMERA::cp_message_func(GPContext *context, const char *text, void *data)
+void CAPTURECAMERA::message_func(GPContext *context, const char *text, void *data)
 {
     fprintf(stdout, "*** Camera message ***\n");
     fprintf(stdout, text, "%s\n");

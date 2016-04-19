@@ -6,12 +6,6 @@
 //  Copyright © 2016 Marcelo Cobias. All rights reserved.
 //
 
-#include <sys/stat.h>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include "capturecamera.h"
 
 
@@ -37,39 +31,40 @@ int main(int argc, char *argv[])
     
     cout << "Sex: ";
     cin >> sex;
-
     
     killCamera();
-    
         
     if(isDirExist("/Users/mcobias/Desktop/DataSet/"))
     {
         if(cam.openCamera(&cam))
         {
-            while(waitKey(33) != 27)
+            while(1)
             {
-                cam.processFrame(imageCapture);
+                cam.capturePreview(imageCapture);
                 transpose(imageCapture, imageCapture);
                 flip(imageCapture, imageCapture, 0);
                 resize(imageCapture, imageCapture, Size(480,640));
                 drawLines(imageCapture);
                 printImage(imageCapture, "Press ESC exit or P take a photo", 100, 100);
-                cam.removeImage();
-                if(i > 4 ){ i = 0;}
                 
-                int c = cvWaitKey(15);
+                int c = cvWaitKey(10);
+                cout << c;
                 
                 if(c == 'p')
                 {
-                    c = 0;
-                    count ++;
-                    cam.setConfigureCameraImageSize(&cam);
-                    cam.setConfigureCameraFlashMode(&cam);
+                    if(count < 2)
+                    {
+                        cam.setConfigureCameraImageSize(&cam);
+                        cam.setConfigureCameraFlashMode(&cam);
+                    }
+                    
                     cam.capturePhoto(imageCapture, 1000);
                     transpose(imageCapture, imageCapture);
                     flip(imageCapture, imageCapture, 0);
                     imwrite("/Users/mcobias/Desktop/DataSet/ImageDataSet_" + name + "_" + year + "_" + sex + "_" + to_string(count) + ".jpg", imageCapture);
                     printImage(imageCapture, "Captured", 600, 100);
+                    c = 0;
+                    count++;
                 }
                 else if( c == '=' && i < 12)
                 {
@@ -81,14 +76,12 @@ int main(int argc, char *argv[])
                     i--;
                     cam.setConfigureCameraZoom(&cam, i);
                 }
-                if(c == 27)
+                else if(c == 27)
                     break;
-                
             }
         }
     }
     
-    cam.removeImage();
     destroyAllWindows();
     return 0;
 }

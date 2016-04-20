@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
                 cam.capturePreview(imageCapture);
                 transpose(imageCapture, imageCapture);
                 flip(imageCapture, imageCapture, 0);
-                resize(imageCapture, imageCapture, Size(480,640));
+                resize(imageCapture, imageCapture, Size(480, 640));
                 drawLines(imageCapture);
                 printImage(imageCapture, "Press ESC exit or P take a photo", 100, 100);
                 
@@ -53,6 +53,7 @@ int main(int argc, char *argv[])
                 {
                     if(count < 2)
                     {
+                        cam.setConfigureCameraAperture(&cam);
                         cam.setConfigureCameraImageSize(&cam);
                         cam.setConfigureCameraFlashMode(&cam);
                     }

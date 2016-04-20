@@ -21,7 +21,7 @@ static int _lookup_widget(CameraWidget*widget, const char *key, CameraWidget **c
 void CAPTURECAMERA::setConfigureCameraFlashMode(void *ref)
 {
     int retval, value;
-    char *mval;
+    char *val;
     //int choices;
     printf("Set flash mode config.\n");
     CameraWidget *rootconfig;
@@ -43,8 +43,8 @@ void CAPTURECAMERA::setConfigureCameraFlashMode(void *ref)
     
     //choices = gp_widget_count_choices (capture);
     //value = gp_widget_get_value (capture, &mval);
-    value = gp_widget_get_choice (capture, 2, (const char**)&mval);
-    value = gp_widget_set_value (child, mval);
+    value = gp_widget_get_choice (capture, 2, (const char**)&val);
+    value = gp_widget_set_value (child, val);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
     printf("Sucess: %d\n", retval);
@@ -63,7 +63,7 @@ void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
 {
     int retval, value;
     //int choices;
-    float rval, min, max;
+    float val, min, max;
     printf("Set zoom config.\n");
     CameraWidget *rootconfig;
     CameraWidget *actualrootconfig;
@@ -83,11 +83,11 @@ void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
     CameraWidget *capture = child;
     
     //choices = gp_widget_count_choices (capture);
-    value = gp_widget_get_value (capture, &rval);
-    value = gp_widget_get_range(capture, &min, &max, &rval);
+    value = gp_widget_get_value (capture, &val);
+    value = gp_widget_get_range(capture, &min, &max, &val);
     
-    rval = (float) x;
-    value = gp_widget_set_value(child, &rval);
+    val = (float) x;
+    value = gp_widget_set_value(child, &val);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
     printf("Sucess: %d\n", retval);
@@ -104,7 +104,7 @@ void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
 void CAPTURECAMERA::setConfigureCameraImageSize(void *ref)
 {
     int retval, value;
-    char *mval;
+    char *val;
     //int choices;
     printf("Set image size config.\n");
     CameraWidget *rootconfig;
@@ -126,8 +126,48 @@ void CAPTURECAMERA::setConfigureCameraImageSize(void *ref)
     
     //choices = gp_widget_count_choices (capture);
     //value = gp_widget_get_value (capture, &mval);
-    value = gp_widget_get_choice (capture, 3, (const char**)&mval);
-    value = gp_widget_set_value (child, mval);
+    value = gp_widget_get_choice (capture, 3, (const char**)&val);
+    value = gp_widget_set_value (child, val);
+    
+    retval = gp_camera_set_config(cameranow, actualrootconfig, context);
+    printf("Sucess: %d\n", retval);
+    
+    if (retval < 0)
+    {
+        closeCamera();
+        openCamera(this);
+    }
+    
+    gp_widget_free(actualrootconfig);
+}
+
+void CAPTURECAMERA::setConfigureCameraAperture(void *ref)
+{
+    int retval, value;
+    char *val;
+    //int choices;
+    printf("Set aperture config.\n");
+    CameraWidget *rootconfig;
+    CameraWidget *actualrootconfig;
+    CameraWidget *child;
+    
+    retval = gp_camera_get_config(cameranow, &rootconfig, context);
+    actualrootconfig = rootconfig;
+    
+    retval = gp_widget_get_child_by_name(rootconfig, "main", &child);
+    
+    rootconfig = child;
+    retval = gp_widget_get_child_by_name(rootconfig, "imgsettings", &child);
+    
+    rootconfig = child;
+    retval = gp_widget_get_child_by_name(rootconfig, "aperture", &child);
+    
+    CameraWidget *capture = child;
+    
+    //choices = gp_widget_count_choices (capture);
+    //value = gp_widget_get_value (capture, &mval);
+    value = gp_widget_get_choice (capture, 48, (const char**)&val);
+    value = gp_widget_set_value (child, val);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
     printf("Sucess: %d\n", retval);
@@ -152,14 +192,14 @@ void CAPTURECAMERA::canon_enable_capture(Camera *camera, GPContext *context, Cam
     if (ret < GP_OK)
     {
         //fprintf (stderr, "lookup widget failed: %d\n", ret);
-        goto out;
+        return;
     }
     
     ret = gp_widget_get_type (child, &type);
     if (ret < GP_OK)
     {
         //fprintf (stderr, "widget get type failed: %d\n", ret);
-        goto out;
+        return;
     }
     switch (type)
     {
@@ -168,13 +208,13 @@ void CAPTURECAMERA::canon_enable_capture(Camera *camera, GPContext *context, Cam
         default:
             fprintf (stderr, "widget has bad type %d\n", type);
             ret = GP_ERROR_BAD_PARAMETERS;
-            goto out;
+            return;
     }
     ret = gp_widget_set_value (child, &onoff);
     if (ret < GP_OK)
     {
         //fprintf (stderr, "toggling Canon capture to %d failed with %d\n", onoff, ret);
-        goto out;
+        return;
     }
     ret = gp_camera_set_config (camera, config, context);
     if (ret < GP_OK)
@@ -182,9 +222,6 @@ void CAPTURECAMERA::canon_enable_capture(Camera *camera, GPContext *context, Cam
         //fprintf (stderr, "camera_set_config failed: %d\n", ret);
         return;
     }
-    
-out:
-    child=NULL;
     return;
 }
 

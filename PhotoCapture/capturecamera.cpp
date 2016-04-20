@@ -16,16 +16,14 @@ static int _lookup_widget(CameraWidget*widget, const char *key, CameraWidget **c
     if (ret < GP_OK)
         ret = gp_widget_get_child_by_label (widget, key, child);
     return ret;
-    
 }
 
 void CAPTURECAMERA::setConfigureCameraFlashMode(void *ref)
 {
     int retval, value;
-    char *val;
+    char *mval;
     //int choices;
-    printf("Set root config flash mode .\n");
-    
+    printf("Set flash mode config.\n");
     CameraWidget *rootconfig;
     CameraWidget *actualrootconfig;
     CameraWidget *child;
@@ -45,8 +43,8 @@ void CAPTURECAMERA::setConfigureCameraFlashMode(void *ref)
     
     //choices = gp_widget_count_choices (capture);
     //value = gp_widget_get_value (capture, &mval);
-    value = gp_widget_get_choice (capture, 2, (const char**)&val);
-    value = gp_widget_set_value (child, val);
+    value = gp_widget_get_choice (capture, 2, (const char**)&mval);
+    value = gp_widget_set_value (child, mval);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
     printf("Sucess: %d\n", retval);
@@ -65,9 +63,8 @@ void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
 {
     int retval, value;
     //int choices;
-    float val, min, max;
-    printf("Set root config zoom.\n");
-    
+    float rval, min, max;
+    printf("Set zoom config.\n");
     CameraWidget *rootconfig;
     CameraWidget *actualrootconfig;
     CameraWidget *child;
@@ -79,18 +76,18 @@ void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
     
     rootconfig = child;
     retval = gp_widget_get_child_by_name(rootconfig, "capturesettings", &child);
-
+    
     rootconfig = child;
     retval = gp_widget_get_child_by_name(rootconfig, "zoom", &child);
     
     CameraWidget *capture = child;
     
-    //choices = gp_widget_count_choices(capture);
-    value = gp_widget_get_value (capture, &val);
-    value = gp_widget_get_range(capture, &min, &max, &val);
-
-    val = (float) x;
-    value = gp_widget_set_value(child, &val);
+    //choices = gp_widget_count_choices (capture);
+    value = gp_widget_get_value (capture, &rval);
+    value = gp_widget_get_range(capture, &min, &max, &rval);
+    
+    rval = (float) x;
+    value = gp_widget_set_value(child, &rval);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
     printf("Sucess: %d\n", retval);
@@ -107,10 +104,9 @@ void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
 void CAPTURECAMERA::setConfigureCameraImageSize(void *ref)
 {
     int retval, value;
-    char *val;
+    char *mval;
     //int choices;
-    printf("Set root config Image Size.\n");
-    
+    printf("Set image size config.\n");
     CameraWidget *rootconfig;
     CameraWidget *actualrootconfig;
     CameraWidget *child;
@@ -130,8 +126,8 @@ void CAPTURECAMERA::setConfigureCameraImageSize(void *ref)
     
     //choices = gp_widget_count_choices (capture);
     //value = gp_widget_get_value (capture, &mval);
-    value = gp_widget_get_choice (capture, 3, (const char**)&val);
-    value = gp_widget_set_value (child, val);
+    value = gp_widget_get_choice (capture, 3, (const char**)&mval);
+    value = gp_widget_set_value (child, mval);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
     printf("Sucess: %d\n", retval);
@@ -197,9 +193,9 @@ bool CAPTURECAMERA::openCamera(void *ref)
 {
     gp_camera_new (&cameranow);
     context = gp_context_new();
-    gp_context_set_error_func(context,  CAPTURECAMERA::error_func, this);
-    gp_context_set_message_func(context, CAPTURECAMERA::message_func, this);
-
+    gp_context_set_error_func(context,  CAPTURECAMERA::cp_error_func, this);
+    gp_context_set_message_func(context, CAPTURECAMERA::cp_message_func, this);
+    
     int ret = gp_camera_init (cameranow, context);
     canon_enable_capture(cameranow, context, NULL);
     
@@ -207,10 +203,10 @@ bool CAPTURECAMERA::openCamera(void *ref)
     {
         return false;
     }
-
+    
     CameraAbilities ca;
     ret = gp_camera_get_abilities (cameranow, &ca);
-
+    
     if (ret < GP_OK)
     {
         return false;
@@ -224,7 +220,7 @@ bool CAPTURECAMERA::closeCamera()
     gp_camera_exit(cameranow, context);
     gp_camera_unref(cameranow);
     gp_context_unref(context);
-
+    
     return true;
 }
 
@@ -235,15 +231,15 @@ void CAPTURECAMERA::capturePreview(Mat &frame)
     gp_file_new(&cf);
     
     gp_camera_capture_preview (cameranow, cf, context);
-
+    
     unsigned long datasize = 0;
     const char *data = NULL;
-
+    
     gp_file_get_data_and_size(cf, &data, &datasize);
-
+    
     if (datasize == 0 )
         return;
-
+    
     imgbuf = Mat(240, 320, CV_8U,(char*)data);
     frame = imdecode(imgbuf, CV_LOAD_IMAGE_COLOR);
     
@@ -260,21 +256,22 @@ bool CAPTURECAMERA::capturePhoto(Mat &frame, int waittime)
     if (ret < GP_OK)
         return false;
     gp_file_new(&cf);
-
+    
     gp_camera_file_get(cameranow, camera_file_path.folder, camera_file_path.name, GP_FILE_TYPE_NORMAL, cf, context);
-
+    
     unsigned long datasize = 0;
     const char *data = NULL;
-
+    
     gp_file_get_data_and_size(cf, &data, &datasize);
-
+    
     imgbuf = Mat(480, 640, CV_8U,(char*)data);
     frame = imdecode(imgbuf, CV_LOAD_IMAGE_COLOR);
+    Image = frame;
     
     gp_camera_file_delete(cameranow, camera_file_path.folder, camera_file_path.name, context);
     gp_file_free(cf);
-
-    frame.copyTo(frame);
+    
+    frame.copyTo(Image);
     
     CameraEventType type;
     void *datavoid;
@@ -295,17 +292,34 @@ bool CAPTURECAMERA::capturePhoto(Mat &frame, int waittime)
             printf("Unexpected event received from camera: %d\n", (int)type);
         }
     }
-
+    
     return true;
 }
 
-void CAPTURECAMERA::error_func(GPContext *context, const char *text, void *data)
+bool CAPTURECAMERA::isCaptured()
+{
+    if (Image.empty() == true)
+        return false;
+    return true;
+}
+
+void CAPTURECAMERA::removeImage()
+{
+    this->Image.release();
+}
+
+Mat CAPTURECAMERA::getImage()
+{
+    return this->Image;
+}
+
+void CAPTURECAMERA::cp_error_func(GPContext *context, const char *text, void *data)
 {
     fprintf(stderr, "*** Camera error ***\n");
     fprintf(stderr, text, "%s\n");
 }
 
-void CAPTURECAMERA::message_func(GPContext *context, const char *text, void *data)
+void CAPTURECAMERA::cp_message_func(GPContext *context, const char *text, void *data)
 {
     fprintf(stdout, "*** Camera message ***\n");
     fprintf(stdout, text, "%s\n");

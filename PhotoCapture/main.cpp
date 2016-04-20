@@ -8,6 +8,7 @@
 
 #include "capturecamera.h"
 
+
 void killCamera();
 bool isDirExist(string path);
 bool makePath(string path);
@@ -30,9 +31,9 @@ int main(int argc, char *argv[])
     
     cout << "Sex: ";
     cin >> sex;
-    
+
     killCamera();
-        
+    
     if(isDirExist("/Users/mcobias/Desktop/DataSet/"))
     {
         if(cam.openCamera(&cam))
@@ -47,7 +48,6 @@ int main(int argc, char *argv[])
                 printImage(imageCapture, "Press ESC exit or P take a photo", 100, 100);
                 
                 int c = cvWaitKey(10);
-                cout << c;
                 
                 if(c == 'p')
                 {
@@ -62,8 +62,9 @@ int main(int argc, char *argv[])
                     flip(imageCapture, imageCapture, 0);
                     imwrite("/Users/mcobias/Desktop/DataSet/ImageDataSet_" + name + "_" + year + "_" + sex + "_" + to_string(count) + ".jpg", imageCapture);
                     printImage(imageCapture, "Captured", 600, 100);
+                    cam.removeImage();
                     c = 0;
-                    count++;
+                    count ++;
                 }
                 else if( c == '=' && i < 12)
                 {
@@ -77,6 +78,7 @@ int main(int argc, char *argv[])
                 }
                 else if(c == 27)
                     break;
+                
             }
         }
     }
@@ -124,7 +126,7 @@ bool makePath(string path)
             if (!makePath( path.substr(0, pos) ))
                 return false;
         }
-
+            
             return 0 == mkdir(path.c_str(), mode);
             
         case EEXIST:
@@ -143,23 +145,23 @@ Mat drawLines(Mat image)
     int eyeL = midX + (image.cols * 0.125); //distância com +- 60 pixeis para resoluções 640x480
     int eyeHeigh = image.rows*0.334375; //Distância de 260 pixeis para imagens 640x480
     
-        //image = imread("teste.ppm");
-        LineIterator it(image, Point(midX, 0), Point(midX, image.rows), 8);
-        // get a line iterator
-        for (int i = 0; i < it.count; i++, it++)
-            if (i % 5 != 0) {
-                (*it)[2] = 255;
-            }         // every 5'th pixel gets dropped, blue stipple line
-        
-        LineIterator it2(image, Point(0, eyeHeigh), Point(image.cols, eyeHeigh), 8);
-        
-        for (int i = 0; i < it2.count; i++, it2++)
-            if (i % 5 != 0) {
-                (*it2)[2] = 255;
-            }
-        
-        line(image, Point(eyeR + 4, eyeHeigh), Point(eyeR - 4, eyeHeigh), Scalar(0, 255, 255), 3, 8);
-        line(image, Point(eyeL + 4, eyeHeigh), Point(eyeL - 4, eyeHeigh), Scalar(0, 255, 255), 3, 8);
+    //image = imread("teste.ppm");
+    LineIterator it(image, Point(midX, 0), Point(midX, image.rows), 8);
+    // get a line iterator
+    for (int i = 0; i < it.count; i++, it++)
+        if (i % 5 != 0) {
+            (*it)[2] = 255;
+        }         // every 5'th pixel gets dropped, blue stipple line
+    
+    LineIterator it2(image, Point(0, eyeHeigh), Point(image.cols, eyeHeigh), 8);
+    
+    for (int i = 0; i < it2.count; i++, it2++)
+        if (i % 5 != 0) {
+            (*it2)[2] = 255;
+        }
+    
+    line(image, Point(eyeR + 4, eyeHeigh), Point(eyeR - 4, eyeHeigh), Scalar(0, 255, 255), 3, 8);
+    line(image, Point(eyeL + 4, eyeHeigh), Point(eyeL - 4, eyeHeigh), Scalar(0, 255, 255), 3, 8);
     
     return image;
 }

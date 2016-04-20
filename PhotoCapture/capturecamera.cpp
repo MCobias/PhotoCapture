@@ -188,7 +188,6 @@ out:
     return;
 }
 
-
 bool CAPTURECAMERA::openCamera(void *ref)
 {
     gp_camera_new (&cameranow);

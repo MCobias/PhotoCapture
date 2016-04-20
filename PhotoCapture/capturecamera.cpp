@@ -24,7 +24,8 @@ void CAPTURECAMERA::setConfigureCameraFlashMode(void *ref)
     int retval, value;
     char *val;
     //int choices;
-    printf("Get root config flash mode .\n");
+    printf("Set root config flash mode .\n");
+    
     CameraWidget *rootconfig;
     CameraWidget *actualrootconfig;
     CameraWidget *child;
@@ -65,7 +66,8 @@ void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
     int retval, value;
     //int choices;
     float val, min, max;
-    printf("Get root config zoom.\n");
+    printf("Set root config zoom.\n");
+    
     CameraWidget *rootconfig;
     CameraWidget *actualrootconfig;
     CameraWidget *child;
@@ -107,7 +109,8 @@ void CAPTURECAMERA::setConfigureCameraImageSize(void *ref)
     int retval, value;
     char *val;
     //int choices;
-    printf("Get root config Image Size.\n");
+    printf("Set root config Image Size.\n");
+    
     CameraWidget *rootconfig;
     CameraWidget *actualrootconfig;
     CameraWidget *child;

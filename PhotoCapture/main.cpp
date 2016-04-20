@@ -8,7 +8,6 @@
 
 #include "capturecamera.h"
 
-
 void killCamera();
 bool isDirExist(string path);
 bool makePath(string path);

@@ -46,9 +46,15 @@ int main(int argc, char *argv[])
                 resize(imageCapture, imageCapture, Size(480, 640));
                 drawLines(imageCapture);
                 printImage(imageCapture, "Press ESC exit or P take a photo", 100, 100);
+                createTrackbar("Zoom", "Press ESC exit or P take a photo", &zoom, 12);
+                
+                if(zoom != contzoom)
+                {
+                    cam.setConfigureCameraZoom(&cam, zoom);
+                    contzoom = zoom;
+                }
                 
                 int c = cvWaitKey(10);
-                
                 if(c == 'p')
                 {
                     if(count < 2)
@@ -56,10 +62,6 @@ int main(int argc, char *argv[])
                         cam.setConfigureCameraAperture(&cam);
                         cam.setConfigureCameraImageSize(&cam);
                         cam.setConfigureCameraFlashMode(&cam);
-                        
-                        cvNamedWindow("Settings",CV_WINDOW_NORMAL);
-                        createTrackbar("Zoom", "Settings", &zoom, 12);
-                        moveWindow("Settings", 300, 100);
                     }
                     
                     cam.capturePhoto(imageCapture, 1000);
@@ -70,11 +72,6 @@ int main(int argc, char *argv[])
                     cam.removeImage();
                     c = 0;
                     count ++;
-                }
-                else if(zoom != contzoom)
-                {
-                    cam.setConfigureCameraZoom(&cam, zoom);
-                    contzoom = zoom;
                 }
                 else if(c == 27)
                     break;

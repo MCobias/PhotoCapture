@@ -62,6 +62,8 @@ public:
     
     bool isCaptured();
     
+    bool saveImageCapturedPath(string path);
+    
     void removeImage();
     
     Mat getImage();

@@ -339,6 +339,16 @@ bool CAPTURECAMERA::isCaptured()
     return true;
 }
 
+bool CAPTURECAMERA::saveImageCapturedPath(string path)
+{
+    if(!Image.empty())
+    {
+        imwrite(path, Image);
+        return true;
+    }
+    return false;
+}
+
 void CAPTURECAMERA::removeImage()
 {
     this->Image.release();

@@ -18,7 +18,7 @@ void printImage(Mat Image, string nameWindow, int PosX, int PosY);
 
 int main(int argc, char *argv[])
 {
-    int i = 0, count = 1;
+    int count = 1, zoom = 0, contzoom = 0;
     CAPTURECAMERA cam;
     string name, year, sex;
     Mat imageCapture;
@@ -56,6 +56,10 @@ int main(int argc, char *argv[])
                         cam.setConfigureCameraAperture(&cam);
                         cam.setConfigureCameraImageSize(&cam);
                         cam.setConfigureCameraFlashMode(&cam);
+                        
+                        cvNamedWindow("Settings",CV_WINDOW_NORMAL);
+                        createTrackbar("Zoom", "Settings", &zoom, 12);
+                        moveWindow("Settings", 300, 100);
                     }
                     
                     cam.capturePhoto(imageCapture, 1000);
@@ -67,19 +71,13 @@ int main(int argc, char *argv[])
                     c = 0;
                     count ++;
                 }
-                else if( c == '=' && i < 12)
+                else if(zoom != contzoom)
                 {
-                    i++;
-                    cam.setConfigureCameraZoom(&cam, i);
-                }
-                else if(c == '-' && i > 0)
-                {
-                    i--;
-                    cam.setConfigureCameraZoom(&cam, i);
+                    cam.setConfigureCameraZoom(&cam, zoom);
+                    contzoom = zoom;
                 }
                 else if(c == 27)
                     break;
-                
             }
         }
     }

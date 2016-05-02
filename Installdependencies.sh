@@ -19,6 +19,12 @@ sudo apt-get autopoint
 sudo apt-get gettext  
 sudo apt-get libtool  
 
+sudo apt-get install qt4-dev-tools
+
+sudo apt-get install libgtk2.0-dev
+
+sudo apt-get install libgtk-3-dev
+
 cd libgphoto2-2.5.10
 
 sudo ./configure

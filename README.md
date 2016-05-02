@@ -5,7 +5,7 @@
 	Dependencies 
 	- OpenCV 3.0
 	- gPhoto 2.5
-	- gkt+ 3.0 
+	- gtk+ 3.0 
 #Files
 	- runapp.sh - run program.
 	- buildapp.sh - compile program.

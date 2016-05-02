@@ -18,7 +18,7 @@ static int _lookup_widget(CameraWidget*widget, const char *key, CameraWidget **c
     return ret;
 }
 
-void CAPTURECAMERA::setConfigureCameraFlashMode(void *ref)
+void CAPTURECAMERA::setConfigureCameraFlashMode(void *ref, int conf)
 {
     int retval, value;
     char *val;
@@ -43,7 +43,7 @@ void CAPTURECAMERA::setConfigureCameraFlashMode(void *ref)
     
     //choices = gp_widget_count_choices (capture);
     //value = gp_widget_get_value (capture, &mval);
-    value = gp_widget_get_choice (capture, 2, (const char**)&val);
+    value = gp_widget_get_choice (capture, conf, (const char**)&val);
     value = gp_widget_set_value (child, val);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
@@ -101,7 +101,7 @@ void CAPTURECAMERA::setConfigureCameraZoom(void *ref, int x)
     gp_widget_free(actualrootconfig);
 }
 
-void CAPTURECAMERA::setConfigureCameraImageSize(void *ref)
+void CAPTURECAMERA::setConfigureCameraImageSize(void *ref, int conf)
 {
     int retval, value;
     char *val;
@@ -126,7 +126,7 @@ void CAPTURECAMERA::setConfigureCameraImageSize(void *ref)
     
     //choices = gp_widget_count_choices (capture);
     //value = gp_widget_get_value (capture, &mval);
-    value = gp_widget_get_choice (capture, 3, (const char**)&val);
+    value = gp_widget_get_choice (capture, conf, (const char**)&val);
     value = gp_widget_set_value (child, val);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
@@ -141,7 +141,7 @@ void CAPTURECAMERA::setConfigureCameraImageSize(void *ref)
     gp_widget_free(actualrootconfig);
 }
 
-void CAPTURECAMERA::setConfigureCameraAperture(void *ref)
+void CAPTURECAMERA::setConfigureCameraAperture(void *ref, int conf)
 {
     int retval, value;
     char *val;
@@ -166,7 +166,7 @@ void CAPTURECAMERA::setConfigureCameraAperture(void *ref)
     
     //choices = gp_widget_count_choices (capture);
     //value = gp_widget_get_value (capture, &mval);
-    value = gp_widget_get_choice (capture, 48, (const char**)&val);
+    value = gp_widget_get_choice (capture, conf, (const char**)&val);
     value = gp_widget_set_value (child, val);
     
     retval = gp_camera_set_config(cameranow, actualrootconfig, context);
@@ -277,12 +277,12 @@ void CAPTURECAMERA::capturePreview(Mat &frame)
         return;
     
     imgbuf = Mat(240, 320, CV_8U,(char*)data);
-    frame = imdecode(imgbuf, CV_LOAD_IMAGE_COLOR);
+    frame = imdecode(imgbuf, IMREAD_COLOR);
     
     gp_file_free(cf);
 }
 
-bool CAPTURECAMERA::capturePhoto(Mat &frame, int waittime)
+bool CAPTURECAMERA::capturePhoto(Mat &frame, int waittime, int width, int height)
 {
     Mat imgbuf;
     CameraFile *cf;
@@ -300,8 +300,8 @@ bool CAPTURECAMERA::capturePhoto(Mat &frame, int waittime)
     
     gp_file_get_data_and_size(cf, &data, &datasize);
     
-    imgbuf = Mat(480, 640, CV_8U,(char*)data);
-    frame = imdecode(imgbuf, CV_LOAD_IMAGE_COLOR);
+    imgbuf = Mat(height, width, CV_8U,(char*)data);
+    frame = imdecode(imgbuf, IMREAD_COLOR);
     Image = frame;
     
     gp_camera_file_delete(cameranow, camera_file_path.folder, camera_file_path.name, context);
@@ -361,12 +361,21 @@ Mat CAPTURECAMERA::getImage()
 
 void CAPTURECAMERA::cp_error_func(GPContext *context, const char *text, void *data)
 {
-    fprintf(stderr, "*** Camera error ***\n");
-    fprintf(stderr, text, "%s\n");
+    GtkWidget *dialog;
+
+    gtk_init(0, 0);
+    dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "Could not detect any camera");
+    gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
+    
 }
 
 void CAPTURECAMERA::cp_message_func(GPContext *context, const char *text, void *data)
 {
-    fprintf(stdout, "*** Camera message ***\n");
-    fprintf(stdout, text, "%s\n");
+    GtkWidget *dialog;
+    
+    gtk_init(0, 0);
+    dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "Camera error");
+    gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
 }

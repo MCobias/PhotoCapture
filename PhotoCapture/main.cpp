@@ -8,33 +8,26 @@
 
 #include "capturecamera.h"
 
-
 void killCamera();
-bool isDirExist(string path);
-bool makePath(string path);
 void captureCamera();
 Mat drawLines(Mat image);
 void printImage(Mat Image, string nameWindow, int PosX, int PosY);
 
+
 int main(int argc, char *argv[])
 {
+    Mat imageCapture;
     int count = 1, zoom = 0, contzoom = 0;
     CAPTURECAMERA cam;
     string name, year, sex;
-    Mat imageCapture;
     
-    cout << "Name Image: ";
-    cin >> name;
-    
-    cout << "Age: ";
-    cin >> year;
-    
-    cout << "Sex: ";
-    cin >> sex;
+    GtkFileChooser *chooser;
+    GtkWidget *dialog;
+    gint res;
 
     killCamera();
     
-    if(isDirExist("/Users/mcobias/Desktop/DataSet/"))
+    try
     {
         if(cam.openCamera(&cam))
         {
@@ -54,21 +47,38 @@ int main(int argc, char *argv[])
                     contzoom = zoom;
                 }
                 
-                int c = cvWaitKey(10);
+                int c = waitKey(1);
                 if(c == 'p')
                 {
                     if(count < 2)
                     {
-                        cam.setConfigureCameraAperture(&cam);
-                        cam.setConfigureCameraImageSize(&cam);
-                        cam.setConfigureCameraFlashMode(&cam);
+                        cam.setConfigureCameraAperture(&cam, 48);
+                        cam.setConfigureCameraImageSize(&cam, 3);
+                        cam.setConfigureCameraFlashMode(&cam, 2);
                     }
                     
-                    cam.capturePhoto(imageCapture, 1000);
+                    cam.capturePhoto(imageCapture, 1000, 640, 480);
                     transpose(imageCapture, imageCapture);
                     flip(imageCapture, imageCapture, 0);
-                    imwrite("/Users/mcobias/Desktop/DataSet/ImageDataSet_" + name + "_" + year + "_" + sex + "_" + to_string(count) + ".jpg", imageCapture);
                     printImage(imageCapture, "Captured", 600, 100);
+                    
+                    gtk_init(&argc, &argv);
+                    dialog = gtk_file_chooser_dialog_new ("Salve capture", NULL, GTK_FILE_CHOOSER_ACTION_SAVE, "Cancel", GTK_RESPONSE_CANCEL, "Save", GTK_RESPONSE_ACCEPT, NULL);
+                    chooser = GTK_FILE_CHOOSER (dialog);
+                    gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
+                    gtk_file_chooser_set_current_name (chooser, "Untitled photo");
+                    
+                    res = gtk_dialog_run (GTK_DIALOG (dialog));
+                    
+                    if (res == GTK_RESPONSE_ACCEPT)
+                    {
+                        string path;
+                        path = gtk_file_chooser_get_filename (chooser);
+                        imwrite(path + ".jpg", imageCapture);
+                    }
+                    gtk_widget_destroy (dialog);
+                   
+                    
                     cam.removeImage();
                     c = 0;
                     count ++;
@@ -77,6 +87,13 @@ int main(int argc, char *argv[])
                     break;
             }
         }
+    }
+    catch(string param)
+    {
+        gtk_init(0, 0);
+        dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "Camera error, disconnect camera!");
+        gtk_dialog_run (GTK_DIALOG (dialog));
+        gtk_widget_destroy (dialog);
     }
     
     destroyAllWindows();
@@ -92,46 +109,6 @@ void printImage(Mat Image, string nameWindow, int PosX, int PosY)
 {
     imshow(nameWindow, Image);
     moveWindow(nameWindow, PosX, PosY);
-}
-
-bool isDirExist(string path)
-{
-    struct stat info;
-    if (stat(path.c_str(), &info) != 0)
-    {
-        makePath(path);
-        return true;
-    }
-    return (info.st_mode & S_IFDIR) != 0;
-}
-
-bool makePath(string path)
-{
-    mode_t mode = 0755;
-    int ret = mkdir(path.c_str(), mode);
-    if (ret == 0)
-        return true;
-    
-    switch (errno)
-    {
-        case ENOENT:
-        {
-            int pos = path.find_last_of('/');
-            if (pos == std::string::npos)
-                return false;
-            if (!makePath( path.substr(0, pos) ))
-                return false;
-        }
-            
-            return 0 == mkdir(path.c_str(), mode);
-            
-        case EEXIST:
-            // done!
-            return isDirExist(path);
-            
-        default:
-            return false;
-    }
 }
 
 Mat drawLines(Mat image)

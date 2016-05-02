@@ -25,6 +25,8 @@
 #include <GPhoto2/gphoto2-camera.h>
 #include <GPhoto2/gphoto2-setting.h>
 
+#include <gtk-3.0/gtk/gtk.h>
+
 using namespace std;
 using namespace cv;
 
@@ -44,7 +46,7 @@ public:
     
     void capturePreview(Mat &frame);
 
-    bool capturePhoto(Mat &frame, int waittime);
+    bool capturePhoto(Mat &frame, int waittime, int width, int height);
     
     static void cp_error_func(GPContext *context, const char *text, void *data);
     
@@ -52,13 +54,13 @@ public:
     
     void canon_enable_capture(Camera *camera, GPContext *context, CameraWidget *config);
 
-    void setConfigureCameraFlashMode(void *ref);
+    void setConfigureCameraFlashMode(void *ref, int conf);
     
-    void setConfigureCameraZoom(void *ref, int x);
+    void setConfigureCameraZoom(void *ref, int conf);
     
-    void setConfigureCameraImageSize(void *ref);
+    void setConfigureCameraImageSize(void *ref, int conf);
     
-    void setConfigureCameraAperture(void *ref);
+    void setConfigureCameraAperture(void *ref, int conf);
     
     bool isCaptured();
     

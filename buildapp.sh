@@ -1,0 +1,3 @@
+#!/bin/sh
+
+sudo g++ -I/usr/local/include/ -I/usr/local/lib/libgphoto2/include/ -L/usr/local/lib/ -L/usr/local/lib/libgphoto2/ -I/usr/include/pango-1.0/ -I/usr/include/gtk-3.0/ -I/usr/include/glib-2.0/ -I/usr/include/gdk-pixbuf-2.0/ -I/usr/lib/x86_64-linux-gnu/glib-2.0/include/ -I/usr/lib/glib-2.0/include/ -I/usr/include/cairo/ -I/usr/lib/gtk-3.0/include/ -I/usr/include/atk-1.0/  -g -o cameraphoto *.cpp -lopencv_core -lopencv_imgproc -lopencv_imgcodecs -lopencv_highgui -lopencv_ml -lopencv_video -lopencv_features2d -lopencv_calib3d -lopencv_objdetect -lopencv_stitching -lgphoto2 -lgtk-3 -lgdk-3 -lgio-2.0 -lpangoft2-1.0 -lgdk_pixbuf-2.0 -lpangocairo-1.0 -lcairo -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0

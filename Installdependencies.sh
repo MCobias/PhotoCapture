@@ -13,11 +13,11 @@ sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavform
 
 sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
 
-sudo apt-get automake
-sudo apt-get autoconf
-sudo apt-get autopoint 
-sudo apt-get gettext  
-sudo apt-get libtool  
+sudo apt-get install automake
+sudo apt-get install autoconf
+sudo apt-get install autopoint 
+sudo apt-get install gettext  
+sudo apt-get install libtool  
 
 sudo apt-get install qt4-dev-tools
 
@@ -65,7 +65,7 @@ sudo -S ldconfig
 
 sudo -S apt-get install gphoto2
 
-sudo -S libgphoto2-6-dev
+sudo -S apt-get install libgphoto2-6-dev
 
 
 
